@@ -22,6 +22,16 @@ const typeDefs = gql`
         precio: Float
         creado: String
     }
+    type Cliente{
+        id: ID
+        nombre: String
+        apellido: String
+        empresa: String
+        email: String
+        telefono: String
+        vendedor: ID
+    }
+
     enum Roles{
         ADMINISTRADOR
         TECNICO
@@ -44,6 +54,14 @@ const typeDefs = gql`
         existencia: Int!
         precio: Float!
     }
+    input ClienteInput{
+        nombre: String!
+        apellido: String!
+        empresa: String!
+        email: String!
+        telefono: String
+    }
+
 
     ##Funciones
     type Query{
@@ -53,6 +71,10 @@ const typeDefs = gql`
         #Productos
         obtenerProductos : [Producto]
         obtenerProducto(id: ID!) : Producto
+
+        #Clientes
+        obtenerClientes:[Cliente]
+        obtenerClientesVendedor:[Cliente]
     }
 
     type Mutation{
@@ -63,6 +85,12 @@ const typeDefs = gql`
         #Productos
         nuevoProducto(input: ProductoInput) : Producto
         actualizarProducto(id: ID!, input: ProductoInput): Producto
+        eliminarProducto(id: ID!): String
+
+        #Clientes
+        nuevoCliente(input: ClienteInput): Cliente
+        actualizarCliente(id: ID!, input: ClienteInput): Cliente
+        eliminarCliente(id:ID!):String
     }
 `;
 
