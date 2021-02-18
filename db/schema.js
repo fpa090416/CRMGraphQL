@@ -31,7 +31,36 @@ const typeDefs = gql`
         telefono: String
         vendedor: ID
     }
+    type Pedido{
+        id: ID
+        pedido: [PedidoGrupo]
+        total: Float
+        cliente:ID
+        vendedor:ID
+        estado: EstadoPedido
+    }
+    type PedidoGrupo{
+        id:ID
+        cantidad: Int
+    }
+    type TopCliente{
+        total: Float
+        cliente: [Cliente]
+    }
+    type TopVendedor{
+        total: Float
+        vendedor:[Usuario]
+    }
 
+
+
+
+    #Enum's de nuestra aplicación
+    enum EstadoPedido{
+        PENDIENTE
+        COMPLETADO
+        CANCELADO
+    }
     enum Roles{
         ADMINISTRADOR
         TECNICO
@@ -61,7 +90,16 @@ const typeDefs = gql`
         email: String!
         telefono: String
     }
-
+    input PedidoProductoInput{
+        id: ID
+        cantidad: Int
+    }
+    input PedidoInput{
+        pedido: [PedidoProductoInput]
+        total: Float
+        cliente: ID
+        estado: EstadoPedido
+    }
 
     ##Funciones
     type Query{
@@ -71,10 +109,22 @@ const typeDefs = gql`
         #Productos
         obtenerProductos : [Producto]
         obtenerProducto(id: ID!) : Producto
+        buscarProducto(texto: String!): [Producto]
 
         #Clientes
         obtenerClientes:[Cliente]
         obtenerClientesVendedor:[Cliente]
+
+        #Pedidos
+        obtenerPedidos:[Pedido]        
+        obtenerPedidosVendedor: [Pedido]
+        obtenerPedido(id:ID!): Pedido
+        obtenerPedidosEstado(estado: String!): [Pedido]
+
+        #Busquedas Avanzadas
+        mejoresClientes: [TopCliente]
+        mejoresVendedores: [TopVendedor]
+        
     }
 
     type Mutation{
@@ -91,6 +141,11 @@ const typeDefs = gql`
         nuevoCliente(input: ClienteInput): Cliente
         actualizarCliente(id: ID!, input: ClienteInput): Cliente
         eliminarCliente(id:ID!):String
+
+        #Pedidos
+        nuevoPedido(input: PedidoInput):Pedido
+        actualizarPedido(id:ID!, input: PedidoInput):Pedido
+        eliminarPedido(id:ID!):String
     }
 `;
 
