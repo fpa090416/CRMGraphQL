@@ -1,4 +1,5 @@
 const Usuario = require('../models/Usuario');
+const Producto = require('../models/Producto');
 
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -15,9 +16,34 @@ const crearToken = (usuario, secreta, expiresIn) =>{
 //Resolver
 const resolvers = {
     Query: {
-        obtenerCurso: ()=>"Algo"
+        obtenerUsuario: async(_,{ token }) =>{
+            const usuarioId= await jwt.verify(token, process.env.SECRETA)
+
+            return usuarioId;
+        },
+        obtenerProductos: async ()=>{
+            try{
+                const productos = await Producto.find({});
+                return productos;
+            }catch(error){
+                console.log(error);
+            }
+        },
+        obtenerProducto: async(_,{ id })=>{
+            //revisar si el producto existe o no
+            const producto = await Producto.findById(id);
+
+            if(!producto){
+                throw new Error('Producto no encontrado');
+            }
+            return producto;
+        }
     },
+
     Mutation:{
+
+        //USUARIOS
+
         nuevoUsuario: async (_,{input})=>{
             const { email, password } = input;
 
@@ -54,11 +80,44 @@ const resolvers = {
             if(!passwordCorrecto){
                 throw new Error('El password es Incorrecto');
             }
+
+            //Revisar estado
+
             //Crear el token
             return {
                 token: crearToken(existeUsuario, process.env.SECRETA, '24h')
             }
+        },
+
+        //PRODUCTOS
+
+        nuevoProducto: async (_, {input})=>{
+            try{
+                const producto = new Producto(input);
+
+                //almacenar en la bd
+                const resultado = await producto.save();
+
+                return resultado;
+            }catch(error){
+                console.log(error);
+            }
+        },
+        actualizarProducto: async(_,{id, input})=>{
+            //revisar si el producto existe o no
+            let producto = await Producto.findById(id);
+
+            if(!producto){
+                throw new Error('Producto no encontrado');
+            }
+
+            //guardalo en la base de datos
+            producto = await Producto.findOneAndUpdate({ _id:id },input,{ new:true });
+
+            return producto;
         }
+
+
     }
 }
 

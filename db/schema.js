@@ -9,13 +9,22 @@ const typeDefs = gql`
         apellido: String
         email: String
         creado: String
+        estado: Int
+        rol: Roles
     }
-    # type Login{
-    #     emal: String
-    #     fecha: String
-    # }
     type Token{
         token: String
+    }
+    type Producto{
+        id: ID
+        nombre: String
+        existencia: Int
+        precio: Float
+        creado: String
+    }
+    enum Roles{
+        ADMINISTRADOR
+        TECNICO
     }
 
     ##Inputs
@@ -24,24 +33,36 @@ const typeDefs = gql`
         apellido: String!
         email:String!
         password: String!
+        rol: Roles!
     }
     input AutenticarInput{
         email: String!
         password: String!
     }
-    # input LoginInput{
-    #     email: String!
-    # }
+    input ProductoInput{
+        nombre: String!
+        existencia: Int!
+        precio: Float!
+    }
 
     ##Funciones
     type Query{
-        obtenerCurso: String
+        ##Usuarios
+        obtenerUsuario(token: String!) : Usuario
+
+        #Productos
+        obtenerProductos : [Producto]
+        obtenerProducto(id: ID!) : Producto
     }
 
     type Mutation{
         ##Usuario
         nuevoUsuario(input: UsuarioInput): Usuario
         autenticarUsuario(input: AutenticarInput): Token
+
+        #Productos
+        nuevoProducto(input: ProductoInput) : Producto
+        actualizarProducto(id: ID!, input: ProductoInput): Producto
     }
 `;
 
