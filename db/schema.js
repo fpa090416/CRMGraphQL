@@ -35,13 +35,15 @@ const typeDefs = gql`
         id: ID
         pedido: [PedidoGrupo]
         total: Float
-        cliente:ID
+        cliente:Cliente
         vendedor:ID
         estado: EstadoPedido
     }
     type PedidoGrupo{
         id:ID
         cantidad: Int
+        nombre: String
+        precio: Float
     }
     type TopCliente{
         total: Float
@@ -51,9 +53,10 @@ const typeDefs = gql`
         total: Float
         vendedor:[Usuario]
     }
-
-
-
+    type Login{
+        email: String
+        fecha: String
+    }
 
     #Enum's de nuestra aplicación
     enum EstadoPedido{
@@ -72,7 +75,6 @@ const typeDefs = gql`
         apellido: String!
         email:String!
         password: String!
-        rol: Roles!
     }
     input AutenticarInput{
         email: String!
@@ -91,8 +93,10 @@ const typeDefs = gql`
         telefono: String
     }
     input PedidoProductoInput{
-        id: ID
+        id:ID
         cantidad: Int
+        nombre: String
+        precio: Float
     }
     input PedidoInput{
         pedido: [PedidoProductoInput]
@@ -104,7 +108,7 @@ const typeDefs = gql`
     ##Funciones
     type Query{
         ##Usuarios
-        obtenerUsuario(token: String!) : Usuario
+        obtenerUsuario : Usuario
 
         #Productos
         obtenerProductos : [Producto]
@@ -114,6 +118,7 @@ const typeDefs = gql`
         #Clientes
         obtenerClientes:[Cliente]
         obtenerClientesVendedor:[Cliente]
+        obtenerCliente(id: ID!): Cliente
 
         #Pedidos
         obtenerPedidos:[Pedido]        

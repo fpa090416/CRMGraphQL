@@ -2,6 +2,7 @@ const Usuario = require('../models/Usuario');
 const Producto = require('../models/Producto');
 const Cliente = require('../models/Cliente');
 const Pedido = require('../models/Pedido');
+const Login = require('../models/Login');
 
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -18,10 +19,8 @@ const crearToken = (usuario, secreta, expiresIn) =>{
 //Resolver
 const resolvers = {
     Query: {
-        obtenerUsuario: async(_,{ token }) =>{
-            const usuarioId= await jwt.verify(token, process.env.SECRETA)
-
-            return usuarioId;
+        obtenerUsuario: async(_,{}, ctx) =>{
+            return ctx.usuario;
         },
 
         //PRODUCTOS
@@ -66,6 +65,23 @@ const resolvers = {
                 console.log(error);
             }
         },
+        obtenerCliente: async (_,{id}, ctx)=>{
+            //Revisar si el cliente existe o no
+            const cliente = await Cliente.findById(id);
+
+            if(!cliente){
+                throw new Error('El cliente no existe');
+            }
+
+            //Quien lo creo puede verlo
+            if(cliente.vendedor.toString() !== ctx.usuario.id){
+                throw new Error('No tienes las credenciales');
+            }
+
+            return cliente;
+        },
+
+        //Pedidos
         obtenerPedidos:async()=>{
             try {
                 const pedidos = await Pedido.find({});
@@ -76,7 +92,7 @@ const resolvers = {
         },
         obtenerPedidosVendedor:async(_,{}, ctx)=>{
             try {
-                const pedidos = await Pedido.find({vendedor: ctx.usuario.id});
+                const pedidos = await Pedido.find({vendedor: ctx.usuario.id}).populate('cliente');
                 return pedidos;
             } catch (error) {
                 console.log(error);
@@ -193,12 +209,13 @@ const resolvers = {
                 throw new Error('El password es Incorrecto');
             }
 
-            //Revisar estado
+            //TODO Revisar estado
+            //TODO Generar registro de Login
 
             //Crear el token
             return {
                 token: crearToken(existeUsuario, process.env.SECRETA, '24h')
-            }
+            }           
         },
 
         //PRODUCTOS

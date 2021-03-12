@@ -30,10 +30,6 @@ const UsuarioSchema = mongoose.Schema({
         type: Number,
         default: 1,
         required: true
-    },
-    rol:{
-        type: String,
-        required: true
     }
 });
 
